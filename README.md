@@ -1,213 +1,112 @@
-# wb-mcp-server
+# 🛒 wb-agent-2026
 
-[![npm version](https://img.shields.io/npm/v/wb-mcp-server)](https://www.npmjs.com/package/wb-mcp-server)
-[![license](https://img.shields.io/npm/l/wb-mcp-server)](LICENSE)
-[![telegram](https://img.shields.io/badge/Telegram-%40dmkosik-26A5E4?logo=telegram&logoColor=white)](https://t.me/dmkosik)
+**MCP-сервер для Wildberries** — подключи любого AI-агента (Claude Desktop и другие) к своему магазину на WB.
 
-[Русская версия](README.ru.md)
+[![npm version](https://img.shields.io/npm/v/wb-agent-2026)](https://www.npmjs.com/package/wb-agent-2026)
+[![license](https://img.shields.io/npm/l/wb-agent-2026)](./LICENSE)
 
-**Author:** Дмитрий Косик · 📢 [Telegram channel @dmkosik](https://t.me/dmkosik) · 💬 [Contact author @feeyh](https://t.me/feeyh)
+---
 
-MCP server for the Wildberries Seller API. Connect any AI agent (Claude Desktop, OpenClaw, or any MCP client) to your Wildberries store.
+## ⚡ Быстрый старт
 
-## Quick Start
+### 1. Получи токен WB
 
-### 1. Install
+Зайди в [личный кабинет продавца](https://seller.wildberries.ru/) → **Настройки → Доступ к API** → создай токен.
 
-```bash
-npm install -g wb-mcp-server
-```
+### 2. Добавь в конфиг Claude Desktop
 
-### 2. Get a WB API token
+**Найди файл конфига:**
 
-Create an API token in your [WB Seller Dashboard](https://seller.wildberries.ru/) under **Settings > API Access**.
+- **Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
-### 3. Add to Claude Desktop config
+**Вставь конфигурацию:**
 
 ```json
 {
   "mcpServers": {
     "wildberries": {
-      "command": "wb-mcp-server",
+      "command": "npx",
+      "args": ["-y", "wb-agent-2026"],
       "env": {
-        "WB_API_TOKEN": "your_token_here"
+        "WB_API_TOKEN": "ВАШ_ТОКЕН_ЗДЕСЬ"
       }
     }
   }
 }
 ```
 
-> **Windows: `spawn wb-mcp-server ENOENT` error**
->
-> If Claude Desktop can't find the `wb-mcp-server` command, use `npx` instead:
->
-> ```json
-> {
->   "mcpServers": {
->     "wildberries": {
->       "command": "npx",
->       "args": ["-y", "wb-mcp-server"],
->       "env": {
->         "WB_API_TOKEN": "your_token_here"
->       }
->     }
->   }
-> }
-> ```
->
-> This commonly happens with the Microsoft Store version of Claude Desktop, which doesn't see the global npm packages path.
+### 3. Перезапусти Claude Desktop
 
-## Updating to the latest version
+Готово! 🎉 Теперь Claude может работать с твоим магазином на WB.
 
-New versions are released regularly — for example, v0.4.0 added 10 new tools (acquiring report, sales summary, content cards, supplies, documents, seller info, item rating). The server does **not** auto-update — you need to update it manually.
+---
 
-### Step 1. Update the package
+## 🛠 Доступные инструменты
 
-**If installed globally** (Claude Desktop config uses `"command": "wb-mcp-server"`):
+| Инструмент | Описание | Тип |
+|---|---|---|
+| `get_feedbacks` | Отзывы покупателей | чтение |
+| `reply_feedback` | Ответить на отзыв | **запись** |
+| `get_unanswered_count` | Кол-во неотвеченных отзывов | чтение |
+| `get_stocks` | Остатки на складах | чтение |
+| `get_orders` | Последние заказы | чтение |
+| `get_sales` | Данные о продажах | чтение |
+| `get_nm_report` | Отчёт по товарам (просмотры, корзина, заказы) | чтение |
+| `get_advert_list` | Список рекламных кампаний | чтение |
+| `get_advert_stats` | Статистика рекламы | чтение |
+| `get_prices` | Цены и скидки | чтение |
+| `get_seller_info` | Информация о продавце | чтение |
+| `get_questions` | Вопросы покупателей | чтение |
+| `get_supplies` | Список поставок | чтение |
+| `get_financial_report` | Финансовый отчёт | чтение |
+| `get_documents` | Финансовые документы | чтение |
 
+---
+
+## 💬 Примеры запросов к Claude
+
+После подключения можно спрашивать Claude:
+
+- _«Покажи мои последние заказы на WB»_
+- _«Сколько неотвеченных отзывов у меня есть?»_
+- _«Какие остатки на складах?»_
+- _«Ответь на все отзывы без ответа»_
+- _«Покажи статистику рекламных кампаний»_
+
+---
+
+## ⚙️ Конфигурация
+
+| Переменная | Описание | Обязательно |
+|---|---|---|
+| `WB_API_TOKEN` | Токен API продавца Wildberries | ✅ Да |
+
+Или передай через CLI:
 ```bash
-npm install -g wb-mcp-server@latest
+npx wb-agent-2026 --token=твой_токен
 ```
 
-**If using `npx`** (Claude Desktop config uses `"command": "npx"`):
+---
+
+## 🔧 Разработка
 
 ```bash
-npx -y wb-mcp-server@latest
-```
-
-If `npx` keeps pulling an old cached version, clear the cache:
-
-```bash
-npm cache clean --force
-```
-
-### Step 2. Fully restart Claude Desktop
-
-Quit the app **from the system tray** (not just closing the window), then reopen it. Otherwise Claude will keep using the old server process.
-
-### Step 3. Verify the version
-
-```bash
-npm list -g wb-mcp-server
-```
-
-Or ask Claude: *"Which wb-mcp-server tools are available to you?"* — v0.4.0 should show 28 tools.
-
-## Available Tools (28)
-
-### Reviews & Questions
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_feedbacks` | Get customer reviews | read |
-| `reply_feedback` | Reply to a review | **write** |
-| `get_questions` | Get customer questions | read |
-| `reply_question` | Reply to a question | **write** |
-| `get_unanswered_count` | Count of unanswered reviews | read |
-
-### Statistics & Analytics
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_stocks` | Warehouse stock levels | read |
-| `get_orders` | Recent orders | read |
-| `get_sales` | Sales data | read |
-| `get_financial_report` | Detailed report: commissions, logistics, storage, penalties | read |
-| `get_nm_report` | Per-product report (views, cart, orders, buyouts) | read |
-| `get_warehouses_inventory` | Real-time warehouse inventory report (async) | read |
-| `get_item_rating` | Seller rating + feedback increase by star | read |
-
-### Advertising
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_advert_list` | Advertising campaigns list | read |
-| `get_advert_stats` | Campaign statistics | read |
-| `get_advert_balance` | Advertising account balance | read |
-| `update_advert_bid` | Update campaign bids | **write** |
-
-### Pricing
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_prices` | Product list with prices and discounts | read |
-| `update_prices` | Update prices and discounts | **write** |
-
-### Finance
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_seller_balance` | Current seller account balance | read |
-| `get_sales_reports_summary` | Weekly sales report summaries (for dashboards) | read |
-| `get_acquiring_report_list` | Acquiring expense report summaries | read |
-| `get_acquiring_report` | Detailed acquiring (card-processing) fees | read |
-
-### Product Cards
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_content_cards` | Product cards listing with cursor pagination | read |
-
-### FBS Supplies
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_supplies` | FBS supplies list | read |
-| `create_supply` | Create a new open FBS supply | **write** |
-
-### Documents
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_documents` | Financial documents: invoices, reports, acts | read |
-
-### Seller Info
-
-| Tool | Description | Type |
-|---|---|---|
-| `get_seller_info` | Name, INN, trademark | read |
-| `get_jam_subscription` | Jam subscription status (requires Service token) | read |
-
-## Example prompts
-
-Ask your AI agent (after connecting the MCP server):
-
-- *"How many unanswered reviews do I have?"*
-- *"Show me the seller rating and feedback breakdown by star for the last 2 weeks"*
-- *"Give me a weekly P&L summary: payouts, logistics, storage, penalties"*
-- *"List the latest financial documents (invoices, weekly reports)"*
-- *"Show acquiring fees for the past month"*
-- *"What's my current account balance and how much can I withdraw?"*
-- *"Find product card by nmID 391083595"*
-- *"List my open FBS supplies"*
-- *"How many sales did I have last week?"*
-- *"Which products convert best from views to orders?"*
-
-## Configuration
-
-| Variable | Description | Required |
-|---|---|---|
-| `WB_API_TOKEN` | Wildberries Seller API token | Yes |
-
-Or pass via CLI: `wb-mcp-server --token=your_token`
-
-## Development
-
-```bash
-git clone https://github.com/dmitriykosik74-rgb/wb-mcp-server.git
-cd wb-mcp-server
+git clone https://github.com/cheesases/wb-agent-2026.git
+cd wb-agent-2026
 npm install
-npm test
 npm run build
 ```
 
-## Contributing
+---
 
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/my-feature`)
-3. Commit your changes (`git commit -m 'feat: add my feature'`)
-4. Push and create a Pull Request
+## 👤 Автор
 
-## License
+- Telegram: [@khaliullovv](https://t.me/khaliullovv)
+- Instagram: [@khaliuloff](https://instagram.com/khaliuloff)
 
-[MIT](LICENSE)
+---
+
+## 📄 Лицензия
+
+[MIT](./LICENSE)
