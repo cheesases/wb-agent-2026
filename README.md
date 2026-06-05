@@ -103,7 +103,7 @@ npm run build
 ## 👤 Автор
 
 - Telegram: [@khaliullovv](https://t.me/khaliullovv)
-- Instagram: [@khaliuloff](https://instagram.com/khaliulloff)
+- Instagram: [@khaliulloff](https://instagram.com/khaliulloff)
 
 ---
 
